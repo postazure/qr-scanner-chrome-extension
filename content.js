@@ -66,16 +66,18 @@ function inputScannedContent (input) {
 }
 
 function decorateInputs () {
+  const inputTypesToDecorate = ['email', 'password', 'search', 'text', 'url']
   let inputs = document.getElementsByTagName('input')
 
   for (let i = 0; i < inputs.length; i++) {
     let input = inputs[i]
-    let scanButton = drawButton(input)
+    
+    if (inputTypesToDecorate.includes(input.getAttribute('type'))) {
+      let scanButton = drawButton(input)
+      scanButton.addEventListener('click', scan(input))
 
-    scanButton.addEventListener('click', scan(input))
-
-    input.before(scanButton)
-
+      input.before(scanButton)
+    }
   }
 }
 
