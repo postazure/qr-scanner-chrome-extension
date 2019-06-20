@@ -71,8 +71,9 @@ function decorateInputs () {
 
   for (let i = 0; i < inputs.length; i++) {
     let input = inputs[i]
-    
-    if (inputTypesToDecorate.includes(input.getAttribute('type'))) {
+
+    let inputDisplay = getComputedStyle(input).getPropertyValue('display')
+    if (inputTypesToDecorate.includes(input.getAttribute('type')) && inputDisplay === 'block' && !input.disabled) {
       let scanButton = drawButton(input)
       scanButton.addEventListener('click', scan(input))
 
