@@ -1,0 +1,22 @@
+{
+  "manifest_version": 2,
+  "name": "QR Input Writer",
+  "version": "0.1",
+  "permissions": [
+    "activeTab"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "instascan-1.0.0.min.js",
+        "content.js"
+      ]
+    }
+  ],
+  "browser_action": {
+    "default_icon": "icon.png"
+  }
+}
