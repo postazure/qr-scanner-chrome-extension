@@ -2,6 +2,11 @@
   "manifest_version": 2,
   "name": "QR Input Writer",
   "version": "0.1",
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
   "permissions": [
     "activeTab"
   ],

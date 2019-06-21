@@ -1,4 +1,4 @@
-let previewModal, scanner
+let previewModal, scanner, isScanning
 
 function drawButton (input) {
   let inputHeight = getComputedStyle(input).getPropertyValue('height')
@@ -13,7 +13,7 @@ function drawVideoPreview () {
   let pageWidth = parseInt(getComputedStyle(document.body).getPropertyValue('width'))
 
   let previewBG = document.createElement('div')
-  previewBG.style = `position: absolute; width: 100%; height: 100%; background-color: rgba(50,50,50,0.8);  z-index: 99999999;`
+  previewBG.style = `position: fixed; width: 100%; height: 100%; background-color: rgba(50,50,50,0.8);  z-index: 99999999;`
   document.body.prepend(previewBG)
 
   let closeButton = document.createElement('div')
@@ -33,11 +33,15 @@ function drawVideoPreview () {
 
 function stopScanning () {
   scanner.stop()
+  isScanning = false
   document.body.removeChild(previewModal)
 }
 
 function scan (input) {
   return function () {
+    if (isScanning) { return }
+    isScanning = true
+
     let videoPanel = drawVideoPreview()
     previewModal = videoPanel.modal
 
@@ -62,6 +66,10 @@ function inputScannedContent (input) {
   return function (content) {
     stopScanning()
     input.value = content
+
+    let e = document.createEvent('HTMLEvents')
+    e.initEvent('scanComplete', false, true)
+    input.dispatchEvent(e)
   }
 }
 
@@ -82,18 +90,28 @@ function decorateInputs () {
   }
 }
 
+chrome.runtime.onConnect.addListener() // Needed to start listening
+
+chrome.runtime.onMessage.addListener(
+  function (request, sender, sendResponse) {
+    if (request.message === 'clicked_browser_action') {
+
+      let input = document.body.appendChild(document.createElement('input'))
+      input.addEventListener('scanComplete', function () {
+        input.select()
+
+        let didCopy = document.execCommand('copy')
+        console.log(didCopy ? 'Successfully copied QR code' : 'Failed to copy QR code')
+
+        setTimeout(function () {
+          input.remove()
+        }, 200)
+      })
+
+      scan(input)()
+    }
+  }
+)
+
 decorateInputs()
 
-// chrome.runtime.onMessage.addListener(
-//   function (request, sender, sendResponse) {
-//     if (request.message === 'clicked_browser_action') {
-//       var firstHref = $('a[href^=\'http\']').eq(0).attr('href')
-//
-//       console.log(firstHref)
-//
-//       // This line is new!
-//       chrome.runtime.sendMessage({ 'message': 'open_new_tab', 'url': firstHref })
-//     }
-//   }
-// )
-//
