@@ -46,7 +46,7 @@ function scan (input) {
     previewModal = videoPanel.modal
 
     scanner = new Instascan.Scanner({ video: videoPanel.video })
-    scanner.addListener('scan', inputScannedContent(input))
+    scanner.addListener('scan', onScanComplete(input))
 
     Instascan.Camera.getCameras().then(function (cameras) {
       if (cameras.length > 0) {
@@ -62,10 +62,11 @@ function scan (input) {
   }
 }
 
-function inputScannedContent (input) {
+function onScanComplete (input) {
   return function (content) {
     stopScanning()
-    input.value = content
+    input.value = decodeURI(content)
+
 
     let e = document.createEvent('HTMLEvents')
     e.initEvent('scanComplete', false, true)
